@@ -1,7 +1,6 @@
 package com.example.hotstreak;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -144,23 +143,48 @@ public class MainActivity extends AppCompatActivity {
                     Streak streak = new Streak(bestStreak, madeStreak, attemptStreak);
                     streaksDB.put(streak);
                     dialog.cancel();
-                    showConfirmationDialog();
+                    showConfirmationDialogSaved();
                 });
 
         dialogBuilder.setNegativeButton(
                 "No",
                 (dialog, id) -> dialog.cancel());
 
-
         AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
     }
 
     public void loadLastHotstreakData(View view) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        dialogBuilder.setMessage("Load last data?");
+        dialogBuilder.setCancelable(true);
+        dialogBuilder.setPositiveButton(
+                "Yes",
+                (dialog, id) -> {
+                    loadLastData();
+                    dialog.cancel();
+                });
+
+        dialogBuilder.setNegativeButton(
+                "No",
+                (dialog, id) -> dialog.cancel());
+
+        dialogBuilder.setNeutralButton(
+                "Delete All",
+                (dialog, id) -> {
+                    streaksDB.removeAll();
+                    dialog.cancel();
+                });
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+    }
+
+    private void loadLastData() {
         Streak lastStreak = streaksDB.query()
-                .orderDesc(Streak_.date) // Order by ID (or use Streak_.timestamp for timestamp)
+                .orderDesc(Streak_.date)
                 .build()
-                .findFirst(); // Get the first result after sorting
+                .findFirst();
 
         if (lastStreak != null) {
             bestStreak = lastStreak.getBestStreak();
@@ -170,14 +194,25 @@ public class MainActivity extends AppCompatActivity {
             shotPercentText.setText(madeStreak + "/" + attemptStreak);
             currentStreak = 0;
             currentStreakText.setText("Current Streak: " + currentStreak);
+            showConfirmationDialogLoaded();
         } else {
             noLoadDataFoundDialog();
         }
     }
 
-    private void showConfirmationDialog() {
+    private void showConfirmationDialogSaved() {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setMessage("Streak Saved!");
+        alertBuilder.setCancelable(true);
+
+        alertBuilder.setNeutralButton("Confirm", (dialog, id) -> {});
+        AlertDialog alert = alertBuilder.create();
+        alert.show();
+    }
+
+    private void showConfirmationDialogLoaded() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setMessage("Data loaded!");
         alertBuilder.setCancelable(true);
 
         alertBuilder.setNeutralButton("Confirm", (dialog, id) -> {});
