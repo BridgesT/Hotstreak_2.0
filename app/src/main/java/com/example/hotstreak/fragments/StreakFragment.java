@@ -73,8 +73,6 @@ public class StreakFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-
     }
 
     @Override
@@ -82,10 +80,7 @@ public class StreakFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_streak, container, false);
-
         initializeButtons(view);
-
-
 
         boxStore = StreakRepository.getInstance(requireContext());
         streaksDB = boxStore.boxFor(Streak.class);

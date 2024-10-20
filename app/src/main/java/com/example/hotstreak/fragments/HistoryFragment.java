@@ -21,7 +21,9 @@ import com.example.hotstreak.R;
 import com.example.hotstreak.Streak;
 import com.example.hotstreak.repository.StreakRepository;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
@@ -61,28 +63,36 @@ public class HistoryFragment extends Fragment {
     public void updateTable() {
         View view = getView(); // Get the current view
         if (view != null) {
+            TableLayout headerTableLayout = view.findViewById(R.id.headerTableLayout);
             TableLayout tableLayout = view.findViewById(R.id.tableLayout);
             tableLayout.removeAllViews(); // Clear old data
 
-            // Create and add the header row
-            TableRow headerRow = new TableRow(getContext());
-            TextView headerBestStreak = configureHistoryTextView(new TextView(getContext()), true);
-            TextView headerMadeShots = configureHistoryTextView(new TextView(getContext()), true);
-            TextView headerAttemptedShots = configureHistoryTextView(new TextView(getContext()), true);
-            TextView headerShotPercentage = configureHistoryTextView(new TextView(getContext()), true);
-            headerBestStreak.setText("Best Streak");
-            headerMadeShots.setText("Made Shots");
-            headerAttemptedShots.setText("Attempted Shots");
-            headerShotPercentage.setText("Shot %");
-            headerRow.addView(headerBestStreak);
-            headerRow.addView(headerMadeShots);
-            headerRow.addView(headerAttemptedShots);
-            headerRow.addView(headerShotPercentage);
-            tableLayout.addView(headerRow);
+            // Create and add the header row if not already added
+            if (headerTableLayout.getChildCount() == 0) {
+                TableRow headerRow = new TableRow(getContext());
+                TextView headerBestStreak = configureHistoryTextView(new TextView(getContext()), true);
+                TextView headerMadeShots = configureHistoryTextView(new TextView(getContext()), true);
+                TextView headerAttemptedShots = configureHistoryTextView(new TextView(getContext()), true);
+                TextView headerShotPercentage = configureHistoryTextView(new TextView(getContext()), true);
+                TextView headerDate = configureHistoryTextView(new TextView(getContext()), true);
+                headerBestStreak.setText("Best Streak");
+                headerMadeShots.setText("Made");
+                headerAttemptedShots.setText("Attempted");
+                headerShotPercentage.setText("Shot %");
+                headerDate.setText("Date");
+                headerRow.addView(headerBestStreak);
+                headerRow.addView(headerMadeShots);
+                headerRow.addView(headerAttemptedShots);
+                headerRow.addView(headerShotPercentage);
+                headerRow.addView(headerDate);
+                headerTableLayout.addView(headerRow);
+            }
 
             // Fetch the latest streak data
             List<Streak> historyItems = streaksDB.getAll();
             historyItems.sort((streak1, streak2) -> Long.compare(streak2.getId(), streak1.getId()));
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
 
             // Populate the table with data from the database
             for (Streak item : historyItems) {
@@ -91,14 +101,17 @@ public class HistoryFragment extends Fragment {
                 TextView madeShots = configureHistoryTextView(new TextView(getContext()), false);
                 TextView attemptedShots = configureHistoryTextView(new TextView(getContext()), false);
                 TextView shotPercentage = configureHistoryTextView(new TextView(getContext()), false);
+                TextView date = configureHistoryTextView(new TextView(getContext()), false);
                 bestStreak.setText(String.valueOf(item.getBestStreak()));
                 madeShots.setText(String.valueOf(item.getMadeShots()));
                 attemptedShots.setText(String.valueOf(item.getAttemptedShots()));
                 shotPercentage.setText(item.getMadeShots() == 0 ? "0.0%" : getShotPercentage(item));
+                date.setText(dateFormat.format(item.getDate()));
                 row.addView(bestStreak);
                 row.addView(madeShots);
                 row.addView(attemptedShots);
                 row.addView(shotPercentage);
+                row.addView(date);
                 tableLayout.addView(row);
             }
         }
