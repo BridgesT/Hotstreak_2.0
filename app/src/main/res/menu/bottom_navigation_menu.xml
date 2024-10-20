@@ -7,8 +7,8 @@
         android:title="Streak" />
 
     <item
-        android:id="@+id/nav_results"
+        android:id="@+id/nav_history"
         android:icon="@drawable/database_list"
-        android:title="Results" />
+        android:title="History" />
 
 </menu>

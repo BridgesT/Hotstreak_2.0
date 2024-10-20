@@ -3,56 +3,93 @@ package com.example.hotstreak;
 import android.app.AlertDialog;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.hotstreak.fragments.HistoryFragment;
+import com.example.hotstreak.fragments.StreakFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
 
 public class MainActivity extends AppCompatActivity {
 
-    int bestStreak, madeStreak=0, attemptStreak=0, currentStreak= 0;
-    BoxStore boxStore;
-    Box<Streak> streaksDB;
+    StreakFragment streakFragment;
+    HistoryFragment historyFragment;
 
-    TextView shotPercentText;
-    TextView bestStreakText;
-    TextView currentStreakText;
+    Fragment activeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        boxStore = MyObjectBox.builder().androidContext(this).build();
-        streaksDB = boxStore.boxFor(Streak.class);
-        shotPercentText = findViewById(R.id.shotPercentText);
-        bestStreakText = findViewById(R.id.bestStreakText);
-        currentStreakText = findViewById(R.id.currentStreak);
-    }
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
 
-        View rootView = findViewById(android.R.id.content).getRootView();
+        streakFragment = new StreakFragment();
+        historyFragment = new HistoryFragment();
 
-        if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 66){
+        // Add fragments to the FragmentManager
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, historyFragment, "historyFragment").hide(historyFragment)
+                .add(R.id.container, streakFragment, "streakFragment")
+                .commit();
 
-            //Toast.makeText(MainActivity.this, "pressed enter", Toast.LENGTH_SHORT).show();
-            updateAttemptStreak(rootView);
+        activeFragment = streakFragment;
 
+        // Setup BottomNavigationView
+        BottomNavigationView bottomNavView = findViewById(R.id.bottomNavigationView);
+        bottomNavView.setOnNavigationItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            switch (item.getItemId()) {
+                case R.id.nav_streak:
+                    selectedFragment = streakFragment;
+                    break;
+                case R.id.nav_history:
+                    LayoutInflater inflater = getLayoutInflater();
+                    ViewGroup container = findViewById(R.id.container);
+                    historyFragment.loadStreakData();
+                    historyFragment.updateTable(inflater, container);
+                    selectedFragment = historyFragment;
+                    break;
+            }
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction().hide(activeFragment).show(selectedFragment).commit();
+                activeFragment = selectedFragment;
+            }
             return true;
-        }
-        else if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 24){
-            updateMadeStreak(rootView);
-            return true;
-        }
-        else return super.dispatchKeyEvent(event);
+        });
     }
+
+
+//    @Override
+//    public boolean dispatchKeyEvent(KeyEvent event) {
+//
+//        View rootView = findViewById(android.R.id.content).getRootView();
+//
+//        if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 66){
+//
+//            //Toast.makeText(MainActivity.this, "pressed enter", Toast.LENGTH_SHORT).show();
+//            updateAttemptStreak(rootView);
+//
+//            return true;
+//        }
+//        else if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 24){
+//            updateMadeStreak(rootView);
+//            return true;
+//        }
+//        else return super.dispatchKeyEvent(event);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -76,157 +113,5 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void updateMadeStreak(View view) {
 
-        madeStreak++;
-        attemptStreak++;
-        if (attemptStreak % 100 == 1 && attemptStreak != 1) {
-            Toast.makeText(MainActivity.this, "You shot over " + (attemptStreak - 1) + " shots!", Toast.LENGTH_SHORT).show();
-        }
-
-        if(currentStreak >= bestStreak) {
-            bestStreak++;
-        }
-        currentStreak++;
-        shotPercentText.setText(madeStreak + "/" + attemptStreak);
-        bestStreakText.setText("Best Streak: "+ bestStreak);
-        currentStreakText.setText("Current Streak: " + currentStreak);
-
-    }
-    public void updateAttemptStreak(View view) {
-
-        attemptStreak++;
-        if (attemptStreak % 100 == 1 && attemptStreak != 1) {
-            Toast.makeText(MainActivity.this, "You shot over " + (attemptStreak - 1) + " shots!", Toast.LENGTH_SHORT).show();
-        }
-        currentStreak = 0;
-        currentStreakText.setText("Current Streak: 0");
-        shotPercentText.setText(madeStreak + "/" + attemptStreak);
-    }
-
-    public void resetAllViews(View view) {
-        attemptStreak = 0;
-        currentStreak = 0;
-        madeStreak = 0;
-        bestStreak = 0;
-        shotPercentText.setText(madeStreak + "/" + attemptStreak);
-        bestStreakText.setText("Best Streak: "+ bestStreak);
-        currentStreakText.setText("Current Streak: " + currentStreak);
-    }
-
-    public void confirmOrCancel(View view) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        dialogBuilder.setMessage("Are you sure you want to reset?");
-        dialogBuilder.setCancelable(true);
-        dialogBuilder.setPositiveButton(
-                "Yes",
-                (dialog, id) -> {
-                    resetAllViews(view);
-                    dialog.cancel();
-                });
-
-        dialogBuilder.setNegativeButton(
-                "No",
-                (dialog, id) -> dialog.cancel());
-
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
-    }
-
-    public void saveButtonClicked(View view) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        dialogBuilder.setMessage("Save this streak?");
-        dialogBuilder.setCancelable(true);
-        dialogBuilder.setPositiveButton(
-                "Yes",
-                (dialog, id) -> {
-                    Streak streak = new Streak(bestStreak, madeStreak, attemptStreak);
-                    streaksDB.put(streak);
-                    dialog.cancel();
-                    showConfirmationDialogSaved();
-                });
-
-        dialogBuilder.setNegativeButton(
-                "No",
-                (dialog, id) -> dialog.cancel());
-
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
-    }
-
-    public void loadLastHotstreakData(View view) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        dialogBuilder.setMessage("Load last data?");
-        dialogBuilder.setCancelable(true);
-        dialogBuilder.setPositiveButton(
-                "Yes",
-                (dialog, id) -> {
-                    loadLastData();
-                    dialog.cancel();
-                });
-
-        dialogBuilder.setNegativeButton(
-                "No",
-                (dialog, id) -> dialog.cancel());
-
-        dialogBuilder.setNeutralButton(
-                "Delete All",
-                (dialog, id) -> {
-                    streaksDB.removeAll();
-                    dialog.cancel();
-                });
-
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
-    }
-
-    private void loadLastData() {
-        Streak lastStreak = streaksDB.query()
-                .orderDesc(Streak_.date)
-                .build()
-                .findFirst();
-
-        if (lastStreak != null) {
-            bestStreak = lastStreak.getBestStreak();
-            bestStreakText.setText("Best Streak: " + bestStreak);
-            attemptStreak = lastStreak.getAttemptedShots();
-            madeStreak = lastStreak.getMadeShots();
-            shotPercentText.setText(madeStreak + "/" + attemptStreak);
-            currentStreak = 0;
-            currentStreakText.setText("Current Streak: " + currentStreak);
-            showConfirmationDialogLoaded();
-        } else {
-            noLoadDataFoundDialog();
-        }
-    }
-
-    private void showConfirmationDialogSaved() {
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setMessage("Streak Saved!");
-        alertBuilder.setCancelable(true);
-
-        alertBuilder.setNeutralButton("Confirm", (dialog, id) -> {});
-        AlertDialog alert = alertBuilder.create();
-        alert.show();
-    }
-
-    private void showConfirmationDialogLoaded() {
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setMessage("Data loaded!");
-        alertBuilder.setCancelable(true);
-
-        alertBuilder.setNeutralButton("Confirm", (dialog, id) -> {});
-        AlertDialog alert = alertBuilder.create();
-        alert.show();
-    }
-
-    private void noLoadDataFoundDialog() {
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setMessage("No previous data found. Save a streak first");
-        alertBuilder.setCancelable(true);
-
-        alertBuilder.setNeutralButton("OK", (dialog, id) -> {});
-        AlertDialog alert = alertBuilder.create();
-        alert.show();
-    }
 }

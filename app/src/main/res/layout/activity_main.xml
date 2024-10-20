@@ -9,128 +9,6 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <Button
-        android:id="@+id/MadeButton"
-        android:layout_width="164dp"
-        android:layout_height="93dp"
-        android:background="@android:color/holo_green_dark"
-        android:onClick="updateMadeStreak"
-        android:text="Made"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toStartOf="@+id/MissedButton"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/resetButton"
-        android:layout_width="139dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:background="#E4CD5C"
-        android:onClick="confirmOrCancel"
-        android:text="Reset"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/MissedButton"
-        android:layout_width="164dp"
-        android:layout_height="93dp"
-        android:background="@android:color/holo_red_dark"
-        android:onClick="updateAttemptStreak"
-        android:text="Missed"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.93"
-        app:layout_constraintStart_toEndOf="@+id/MadeButton"
-        app:layout_constraintTop_toTopOf="@+id/MadeButton" />
-
-    <TextView
-        android:id="@+id/bestStreakText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:text="Best Streak"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/currentStreak"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/currentStreak"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:text="Current Streak"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@id/MadeButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/CurrentStreakHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hot Streak"
-        android:textAlignment="center"
-        android:textSize="50sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13999999" />
-
-    <TextView
-        android:id="@+id/shotPercentText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoText="false"
-        android:maxLines="1"
-        android:text="0/0"
-        android:textAlignment="center"
-        android:textSize="120sp"
-        app:autoSizeTextType="uniform"
-        app:layout_constraintBaseline_toBottomOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bestStreakText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CurrentStreakHeader"
-        app:layout_constraintVertical_bias="0.23000002" />
-
-    <Button
-        android:id="@+id/SaveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:background="#B43BFF"
-        android:onClick="saveButtonClicked"
-        android:text="Save"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/LoadButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:background="#B43BFF"
-        android:onClick="loadLastHotstreakData"
-        android:text="Load Last"
-        app:layout_constraintStart_toEndOf="@+id/SaveButton"
-        app:layout_constraintTop_toTopOf="@+id/SaveButton" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -140,9 +18,28 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navigation_menu" />
 
-    <!--    <include-->
-    <!--        android:id="@+id/include"-->
-    <!--        layout="@layout/content_main"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/bottomNavigationView" />-->
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintTop_toTopOf="parent">
+
+<!--        <fragment-->
+<!--            android:id="@+id/streakFragment"-->
+<!--            android:name="com.example.hotstreak.fragments.StreakFragment"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            tools:layout="@layout/fragment_streak" />-->
+
+<!--        <fragment-->
+<!--            android:id="@+id/historyFragment"-->
+<!--            android:name="com.example.hotstreak.fragments.HistoryFragment"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            tools:layout="@layout/fragment_history"-->
+<!--            android:visibility="gone"-->
+        />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
