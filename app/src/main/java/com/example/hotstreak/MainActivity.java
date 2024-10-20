@@ -1,28 +1,18 @@
 package com.example.hotstreak;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.hotstreak.fragments.HistoryFragment;
 import com.example.hotstreak.fragments.StreakFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import io.objectbox.Box;
-import io.objectbox.BoxStore;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
         activeFragment = streakFragment;
 
-        // Setup BottomNavigationView
         BottomNavigationView bottomNavView = findViewById(R.id.bottomNavigationView);
         bottomNavView.setOnNavigationItemSelectedListener(item -> {
             Fragment selectedFragment = null;
@@ -56,10 +45,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = streakFragment;
                     break;
                 case R.id.nav_history:
-                    LayoutInflater inflater = getLayoutInflater();
-                    ViewGroup container = findViewById(R.id.container);
-                    historyFragment.loadStreakData();
-                    historyFragment.updateTable(inflater, container);
+                    historyFragment.updateTable();
                     selectedFragment = historyFragment;
                     break;
             }
@@ -72,24 +58,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    @Override
-//    public boolean dispatchKeyEvent(KeyEvent event) {
-//
-//        View rootView = findViewById(android.R.id.content).getRootView();
-//
-//        if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 66){
-//
-//            //Toast.makeText(MainActivity.this, "pressed enter", Toast.LENGTH_SHORT).show();
-//            updateAttemptStreak(rootView);
-//
-//            return true;
-//        }
-//        else if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 24){
-//            updateMadeStreak(rootView);
-//            return true;
-//        }
-//        else return super.dispatchKeyEvent(event);
-//    }
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+
+        View rootView = findViewById(android.R.id.content).getRootView();
+
+        if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 66){
+            streakFragment.updateAttemptStreak(rootView);
+            return true;
+        }
+        else if(event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 24){
+            streakFragment.updateMadeStreak(rootView);
+            return true;
+        }
+        else return super.dispatchKeyEvent(event);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -109,9 +92,6 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-
 }
