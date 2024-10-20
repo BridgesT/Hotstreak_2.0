@@ -32,7 +32,7 @@ public class StreakFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    int bestStreak, madeStreak=0, attemptStreak=0, currentStreak= 0;
+    int bestStreak = 0, madeStreak = 0, attemptStreak = 0, currentStreak = 0;
     BoxStore boxStore;
     Box<Streak> streaksDB;
 
